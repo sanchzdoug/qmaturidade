@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Questionário de Maturidade em Gestão de Riscos</title>
+  <style>
+    :root {
+      --bg: #0f172a; /* slate-900 */
+      --card: #111827; /* gray-900 */
+      --muted: #94a3b8; /* slate-400 */
+      --text: #e5e7eb;  /* gray-200 */
+      --accent: #22c55e; /* green-500 */
+      --border: #1f2937; /* gray-800 */
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
+      color: var(--text); background: linear-gradient(180deg, #0b1024, #0f172a);
+    }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 24px; }
+    .card {
+      background: rgba(17,24,39,.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px; margin: 16px 0;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    h1 { margin: 0 0 12px; font-size: 26px; }
+    p.desc { color: var(--muted); margin-top: 0; }
+    label.lead { display:block; margin: 10px 0 6px; color: var(--muted); }
+    input[type="text"], input[type="email"] {
+      width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border);
+      background: #0b1220; color: var(--text);
+    }
+    .q { margin-bottom: 18px; }
+    .q-title { font-weight: 600; margin-bottom: 8px; }
+    .options { display: grid; gap: 8px; }
+    .opt { display:flex; align-items:center; gap: 8px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background:#0b1220; }
+    .opt input { transform: scale(1.2); }
+    .footer {
+      display:flex; gap:12px; align-items:center; justify-content: space-between; flex-wrap: wrap;
+      border-top:1px dashed var(--border); padding-top: 16px; margin-top: 16px;
+      color: var(--muted);
+    }
+    button.primary {
+      background: var(--accent); color: #052e13; border:none; padding: 12px 18px;
+      border-radius: 12px; font-weight: 700; cursor:pointer;
+    }
+    .small { font-size: 12px; color: var(--muted); }
+    a { color: #93c5fd; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Questionário de Maturidade em Gestão de Riscos</h1>
+      <p class="desc">Preencha seus dados para que possamos entrar em contato e, em seguida, responda às perguntas. No final, você poderá <b>exportar</b> suas respostas em CSV para análise e também elas ficarão salvas no seu navegador para continuar mais tarde.</p>
+      <form id="form">
+        <div id="lead"></div>
+        <hr class="card" style="height:1px;padding:0;margin:16px 0;background:#0b1220;border:1px solid var(--border)">
+        <div id="questions"></div>
+        <div class="footer">
+          <div>
+            <span class="small">Suas respostas ficam armazenadas localmente (localStorage). Você pode exportar o CSV para consolidar com outros respondentes.</span>
+          </div>
+          <div>
+            <button type="button" class="primary" id="salvar">Salvar & Exportar CSV</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card small">
+      <b>Integração futura:</b> é possível apontar o envio para uma API (Google Sheets, n8n, etc.). Defina a URL no campo <code>WEBHOOK_URL</code> no script abaixo.
+    </div>
+  </div>
+
+  <script>
+    const DATA = {"title": "Questionário de Maturidade em Gestão de Riscos", "lead_fields": ["Nome", "E-mail", "Empresa"], "questions": [{"text": "Como você avalia o estágio atual da gestão de riscos da sua empresa?", "type": "likert", "options": ["Inicial - A gestão de riscos é reativa, sem processos definidos ou estrutura formal", "Fragmentado - Existem práticas isoladas de gestão de riscos, com pouca coordenação entre áreas", "Gerenciado - A gestão de riscos é formalizada, com processos padronizados e responsabilidades claras", "Integrado - A gestão de riscos está integrada às operações e decisões estratégicas, com uso de tecnologia e integração entre áreas", "Inteligência em Riscos - A gestão de riscos é proativa e preditiva, com o uso de análises avançadas e alinhada ao planejamento estratégico"]}, {"text": "Sua empresa utiliza metodologias específicas para gestão de riscos?", "type": "likert", "options": ["Não utiliza nenhuma metodologia", "Utiliza metodologias genéricas sem adaptação", "Algumas áreas utilizam metodologias próprias", "Utiliza metodologias reconhecidas com adaptações internas", "Utiliza metodologias consolidadas e alinhadas às melhores práticas internacionais"]}, {"text": "Quem é responsável pela gestão de riscos?", "type": "likert", "options": ["Não há responsáveis definidos", "Responsabilidade informal de alguns gestores", "Cada área cuida dos seus riscos", "Existe uma área formal de riscos", "Gestão de riscos é integrada e patrocinada pela alta liderança"]}, {"text": "Qual a abrangência na gestão dos riscos?", "type": "likert", "options": ["Não existe formalização das categorias dos riscos gerenciados", "Apenas riscos financeiros e de conformidade são gerenciados", "Além de riscos financeiros e conformidade são considerados riscos operacionais e estratégicos", "Categorias de riscos bem definidas e gerenciadas, incluindo riscos financeiros, operacionais, estratégicos, reputacionais, regulatório e tecnológico", "Além de gerenciar todo o espectro de riscos, há também foco nos riscos emergentes e extremos"]}, {"text": "Como sua empresa identifica riscos?", "type": "likert", "options": ["Não há processo formal de identificação", "Identificação ocorre apenas após incidentes", "Riscos são identificados pontualmente por áreas", "Há processo periódico de identificação de riscos", "Existe um sistema estruturado e contínuo de identificação, utilizando agentes de IA e IA generativa para identificação de riscos"]}, {"text": "Como sua empresa identifica e acompanha riscos emergentes (novos, incertos ou de difícil previsão)?", "type": "likert", "options": ["Não identifica riscos emergentes", "Identifica apenas após impactos negativos", "Algumas áreas monitoram riscos emergentes pontualmente", "Há processo estruturado para identificar e revisar riscos emergentes", "Riscos emergentes são monitorados continuamente com apoio de inteligência e cenários futuros"]}, {"text": "Como os riscos são avaliados em sua empresa?", "type": "likert", "options": ["Não são avaliados", "Avaliação subjetiva e informal", "Avaliação com critérios básicos", "Avaliação com metodologia definida", "Avaliação quantitativa e integrada à estratégia"]}, {"text": "Como sua empresa trata os riscos em relação ao seu apetite ao risco?", "type": "likert", "options": ["Não há definição de apetite ao risco e os riscos não são tratados", "Os riscos são tratados de forma improvisada, sem considerar apetite", "Existem planos de tratamento, mas o apetite ao risco não é formalizado", "Os riscos são tratados com base em planos formais e alinhamento parcial ao apetite", "Os riscos são tratados estrategicamente com base em apetite ao risco definido e revisado pela liderança"]}, {"text": "Como sua empresa elabora planos de ação para tratamento de riscos e avalia seu custo-benefício?", "type": "likert", "options": ["Não elabora planos de ação nem avalia custo-benefício", "Elabora planos básicos sem análise de viabilidade", "Elabora planos formais, mas sem considerar custo-benefício", "Elabora planos com análise pontual de custo-benefício", "Elabora planos integrados com análise estruturada de custo-benefício e priorização estratégica"]}, {"text": "Como os riscos são monitorados?", "type": "likert", "options": ["Não são monitorados", "Monitoramento reativo após problemas", "Monitoramento esporádico por áreas", "Monitoramento regular com indicadores", "Monitoramento contínuo com alertas e análises preditivas"]}, {"text": "Como sua empresa planeja e executa testes de controle para verificar a eficácia da gestão de riscos?", "type": "likert", "options": ["Não realiza testes de controle", "Realiza testes apenas após falhas ou auditorias externas", "Algumas áreas realizam testes pontuais sem planejamento formal", "Realiza testes periódicos com planejamento básico", "Realiza testes sistemáticos com planejamento formal, critérios definidos e revisão contínua"]}, {"text": "Como os riscos são comunicados internamente?", "type": "likert", "options": ["Não são comunicados", "Comunicação informal entre colegas", "Relatórios pontuais para gestores", "Relatórios regulares para liderança", "Comunicação estruturada e transparente em todos os níveis"]}]};
+    const STORAGE_KEY = "qmaturidade-respostas";
+    const WEBHOOK_URL = ""; // ex.: "https://seu-n8n-ou-endpoint/api/lead"
+
+    function el(tag, attrs = {}, children = []) {
+      const e = document.createElement(tag);
+      Object.entries(attrs).forEach(([k,v]) => {
+        if (k === "class") e.className = v;
+        else if (k === "html") e.innerHTML = v;
+        else e.setAttribute(k, v);
+      });
+      (Array.isArray(children) ? children : [children]).forEach(c => {
+        if (c===null || c===undefined) return;
+        if (typeof c === "string") e.appendChild(document.createTextNode(c));
+        else e.appendChild(c);
+      });
+      return e;
+    }
+
+    function render() {
+      const leadBox = document.getElementById("lead");
+      DATA.lead_fields.forEach(name => {
+        const type = name.toLowerCase().includes("mail") ? "email" : "text";
+        leadBox.appendChild(el("label", {class:"lead"}, name));
+        leadBox.appendChild(el("input", {type, name, required: true}));
+      });
+
+      const qBox = document.getElementById("questions");
+      DATA.questions.forEach((q, idx) => {
+        const wrap = el("div", {class:"q"});
+        wrap.appendChild(el("div", {class:"q-title"}, `${idx+1}) ${q.text}`));
+        const opts = el("div", {class:"options"});
+        if (q.type === "likert") {
+          q.options.forEach((o, oi) => {
+            const id = `q${idx}_opt${oi}`;
+            const row = el("label", {class:"opt"}, [
+              el("input", {type:"radio", name:`q_${idx}`, value: o, id, required: true}),
+              el("span", {}, o),
+            ]);
+            opts.appendChild(row);
+          });
+        } else {
+          opts.appendChild(el("input", {type:"text", name:`q_${idx}`, placeholder:"Digite sua resposta"}));
+        }
+        wrap.appendChild(opts);
+        qBox.appendChild(wrap);
+      });
+
+      // Load saved data
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+      if (saved) {
+        // leads
+        DATA.lead_fields.forEach(name => {
+          const input = document.querySelector(`[name="${name}"]`);
+          if (input && saved[name]) input.value = saved[name];
+        });
+        // questions
+        DATA.questions.forEach((q, idx) => {
+          const val = saved[`q_${idx}`];
+          if (!val) return;
+          if (q.type === "likert") {
+            const input = Array.from(document.querySelectorAll(`[name="q_${idx}"]`)).find(i => i.value === val);
+            if (input) input.checked = true;
+          } else {
+            const input = document.querySelector(`[name="q_${idx}"]`);
+            if (input) input.value = val;
+          }
+        });
+      }
+    }
+
+    function collect() {
+      const data = {
+        submitted_at: new Date().toISOString()
+      };
+      DATA.lead_fields.forEach(name => {
+        const input = document.querySelector(`[name="${name}"]`);
+        data[name] = input ? input.value.trim() : "";
+      });
+      DATA.questions.forEach((q, idx) => {
+        if (q.type === "likert") {
+          const sel = document.querySelector(`[name="q_${idx}"]:checked`);
+          data[`q_${idx}`] = sel ? sel.value : "";
+        } else {
+          const input = document.querySelector(`[name="q_${idx}"]`);
+          data[`q_${idx}`] = input ? input.value.trim() : "";
+        }
+      });
+      return data;
+    }
+
+    function toCSV(obj) {
+      const headers = Object.keys(obj);
+      const csvRow = headers.map(h => JSON.stringify(obj[h] ?? "")).join(",");
+      return headers.join(",") + "\n" + csvRow + "\n";
+    }
+
+    async function maybeSendWebhook(payload) {
+      if (!WEBHOOK_URL) return null;
+      try {
+        const res = await fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify(payload)
+        });
+        return await res.text();
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function download(filename, text) {
+      const blob = new Blob([text], {type: "text/plain;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      render();
+      document.getElementById("salvar").addEventListener("click", async () => {
+        const data = collect();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        await maybeSendWebhook(data);
+        const csv = toCSV(data);
+        download("resposta_qmaturidade.csv", csv);
+        alert("Respostas salvas localmente e CSV exportado. Para consolidar leads, publique este arquivo e defina o WEBHOOK_URL.");
+      });
+    });
+  </script>
+</body>
+</html>
